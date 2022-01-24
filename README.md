@@ -1,9 +1,8 @@
 # AutoCI
 Official PyTorch implementation for the following manuscript:
 
-[Automated causal inference in application to randomized controlled clinical trials](https://openreview.net/forum?id=qKZH_U-tn9P), Nature Machine Intelligence (2022). \
-Jiqing Wu, Nanda Horeweg, Marco de Bruyn, Remi A. Nout, Ina M. Jürgenliemk-Schulz, Ludy C.H.W. Lutgens, Jan J. Jobsen,  
-Elzbieta M. van der Steen-Banasik, Hans W. Nijman, Vincent T.H.B.M. Smit, Tjalling Bosse, Carien L. Creutzberg, and Viktor H. Koelzer.
+[Automated causal inference in application to randomized controlled clinical trials](https://arxiv.org/pdf/2201.05773.pdf), Nature Machine Intelligence (2022). \
+Jiqing Wu, Nanda Horeweg, Marco de Bruyn, Remi A. Nout, Ina M. Jürgenliemk-Schulz, Ludy C.H.W. Lutgens, Jan J. Jobsen, Elzbieta M. van der Steen-Banasik, Hans W. Nijman, Vincent T.H.B.M. Smit, Tjalling Bosse, Carien L. Creutzberg, and Viktor H. Koelzer.
 
 
 > Randomized controlled trials (RCTs) are considered as the gold standard for testing causal hypotheses in the clinical domain. However, the investigation of prognostic variables of patient outcome in a hypothesized cause-effect route is not feasible using standard statistical methods. Here, we propose a new automated causal inference method (AutoCI) built upon the invariant causal prediction (ICP) framework for the causal re-interpretation of clinical trial data. Compared to existing methods, we show that the proposed AutoCI allows to efficiently determine the causal variables with a clear differentiation on two real-world RCTs of endometrial cancer patients with mature outcome and extensive clinicopathological and molecular data. This is achieved via suppressing the causal probability of non-causal variables by a wide margin. In ablation studies, we further demonstrate that the assignment of causal probabilities by AutoCI remain consistent in the presence of confounders. In conclusion, these results confirm the robustness and feasibility of AutoCI for future applications in real-world clinical analysis.

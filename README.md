@@ -19,7 +19,7 @@ The overall model illustration and performance of the proposed AutoCI.
 
 
 ## Installation
-This implementation is dependent on heavily refactored [HOUDINI](https://github.com/trishullab/houdini) and libraries from [AICP](https://github.com/juangamella/aicp.). While [HOUDINI](https://github.com/trishullab/houdini) is compatible to a large variety of PyTorch versions, the libraries that are refactored from [AICP](https://github.com/juangamella/aicp.) require certain specific packages.
+This implementation is dependent on heavily refactored [HOUDINI](https://github.com/trishullab/houdini) and libraries from [AICP](https://github.com/juangamella/aicp). While [HOUDINI](https://github.com/trishullab/houdini) is compatible to a large variety of PyTorch versions, the libraries that are refactored from [AICP](https://github.com/juangamella/aicp.) require certain specific packages.
 
 **Prerequisites**    
 This implementation has been successfully tested under the following configurations,
@@ -60,13 +60,13 @@ You could also try creating a conda environment from [environment.yml](environme
 ## Data Preparation
 Download the following toy datasets and unzip them resp.:   
 - Finite sample setting  
-    - [0 confounder](https://drive.google.com/file/d/1wDDYCcw-i9Ol6mZs9vOfKkL_1GBmVFbO/view?usp=sharing)
-    - [1 confounder](https://drive.google.com/file/d/1HAIeYOU_J8lhzuzZAJStiZcDF8rq6Y7P/view?usp=sharing)
-    - [2 confounders](https://drive.google.com/file/d/1NWOS6tZMQYBCRSSHCfZxb3sT-dNo3Int/view?usp=sharing)
+    - [0 confounder](https://zenodo.org/records/10042871/files/fin.zip?download=1)
+    - [1 confounder](https://zenodo.org/records/10042871/files/fin1.zip?download=1)
+    - [2 confounders](https://zenodo.org/records/10042871/files/fin2.zip?download=1)
 - ABCD setting  
-    - [0 confounder](https://drive.google.com/file/d/18c6LW0heJ7oFZfctNcobh6xaW0pi4uUA/view?usp=sharing)
-    - [1 confounder](https://drive.google.com/file/d/1igiSYE2YX-Z5NE1PvSd1DrWpAwkQYmgz/view?usp=sharing)
-    - [2 confounders](https://drive.google.com/file/d/108dygz9ci0-CJDml7SC_H2JHN4jw4Exo/view?usp=sharing)
+    - [0 confounder](https://zenodo.org/records/10042871/files/abcd.zip?download=1)
+    - [1 confounder](https://zenodo.org/records/10042871/files/abcd1.zip?download=1) 
+    - [2 confounders](https://zenodo.org/records/10042871/files/abcd2.zip?download=1)
 
 ## Run the Experiments
 In case of using Docker image, you could first launch the Docker image

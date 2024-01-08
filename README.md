@@ -1,7 +1,7 @@
 # AutoCI
 Official PyTorch implementation for the following manuscript:
 
-[Automated causal inference in application to randomized controlled clinical trials](https://arxiv.org/pdf/2201.05773.pdf), Nature Machine Intelligence (2022). \
+[Automated causal inference in application to randomized controlled clinical trials](https://www.nature.com/articles/s42256-022-00470-y), Nature Machine Intelligence (2022). \
 Jiqing Wu, Nanda Horeweg, Marco de Bruyn, Remi A. Nout, Ina M. Jürgenliemk-Schulz, Ludy C.H.W. Lutgens, Jan J. Jobsen, Elzbieta M. van der Steen-Banasik, Hans W. Nijman, Vincent T.H.B.M. Smit, Tjalling Bosse, Carien L. Creutzberg, and Viktor H. Koelzer.
 
 

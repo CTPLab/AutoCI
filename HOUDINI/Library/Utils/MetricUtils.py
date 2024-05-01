@@ -9,6 +9,7 @@ import pylatex as pl
 class coxsum():
     def __init__(self,
                  index,
+                 weight,
                  params,
                  alpha=0.05,
                  file_nm='portec'):
@@ -33,21 +34,16 @@ class coxsum():
         self.ci = 100 * (1 - self.alpha)
         self.z = self._inv_normal_cdf(1 - self.alpha / 2)
         self.index = index
+        self.weight = np.asarray(weight).T
         self.file_nm = file_nm
-        # be careful with the axis
-        # here the param is the gradients for inputs
-        self.param = pd.Series(np.mean(params, axis=0),
-                               name='param',
-                               index=self.index)
-        # standard error
-        self.se = pd.Series(stats.sem(params, axis=0),
-                            name='se',
-                            index=self.index)
+        self.param = np.mean(params, axis=0)
+        self.se = stats.sem(params, axis=0)
+
         # confidence interval
-        self.conf_inv = self._compute_confidence_intervals(self.param,
-                                                           self.se,
-                                                           self.ci,
-                                                           self.z)
+        # self.conf_inv = self._compute_confidence_intervals(self.param,
+        #                                                    self.se,
+        #                                                    self.ci,
+        #                                                    self.z)
 
     def _inv_normal_cdf(self, p) -> float:
         return stats.norm.ppf(p)
@@ -85,27 +81,31 @@ class coxsum():
         with np.errstate(invalid='ignore', divide='ignore', over='ignore', under='ignore'):
             df = pd.DataFrame(index=self.index)
             df.index.name = 'features'
-            df['coef'] = self.param
-            df['exp(coef)'] = pd.Series(np.exp(self.param),
-                                        name='exp(coef)',
-                                        index=self.index)
-            df['se(coef)'] = self.se
-            df['{}% CI(cl)'.format(self.ci)
-               ] = self.conf_inv['{}% lower-bound'.format(self.ci)]
-            df['{}% CI(cu)'.format(self.ci)
-               ] = self.conf_inv['{}% upper-bound'.format(self.ci)]
-            df['{}% CI(el)'.format(self.ci)] = np.exp(
-                self.param - self.z * self.se)
-            df['{}% CI(eu)'.format(self.ci)] = np.exp(
-                self.param + self.z * self.se)
-            df['z'] = self._compute_z_values()
-            df['p'] = self._compute_p_values()
-            # avoid zero
-            df.loc[df['p'] <= 1e-16, 'p'] = 1e-16
-            df['-log2(p)'] = -self._quiet_log2(df['p'])
-            # 4 digits after decimal
-            # df.update(df.iloc[:, ].apply(
-            #     lambda x: (x * 1e3).astype(int) / 1e3))
+            df[f'coef'] = self.param[0]
+            df[f'se(coef)'] = self.se[0]
+            df[f'exp(coef)'] = np.exp(self.param[0])
+            df[f'{self.ci}% CI(cl)'] = np.exp(
+                self.param[0] - self.z * self.se[0])
+            df[f'{self.ci}% CI(cu)'] = np.exp(
+                self.param[0] + self.z * self.se[0])
+            df['p'] = stats.chi2.sf((self.param[0] / self.se[0]) ** 2, 1)
+
+            for i in range(len(self.param)):
+                df[f'coef_{i}'] = self.param[i]
+
+            for i in range(0, len(self.param)):
+                _hr = self.param[i] * self.weight[i] - \
+                    self.param[0] * self.weight[0]
+                df[f'Hazard_ratio_{i}'] = np.exp(_hr)
+                df[f'{self.ci}% CI(cl)_{i}'] = np.exp(
+                    _hr - self.z * self.se[i] * self.weight[i])
+                df[f'{self.ci}% CI(cu)_{i}'] = np.exp(
+                    _hr + self.z * self.se[i] * self.weight[i])
+            for col in df:
+                if col != 'p':
+                    df[col] = df[col].round(4)
+                else:
+                    df[col] = df[col].astype(np.float32)
 
         doc = pl.Document()
         doc.packages.append(pl.Package('adjustbox'))

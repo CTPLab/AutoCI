@@ -157,7 +157,6 @@ def get_lganm_io_examples(lganm_envs: List[np.ndarray],
             env = env[:max_len]
         dt_input.append(env[:, cfd_msk])
         dt_lab.append(env[:, lab_msk])
-        # dt_lab[-1][:]= env_id
 
     dt_trn = (np.stack(dt_input, 1),
               np.stack(dt_lab, 1))
@@ -165,8 +164,95 @@ def get_lganm_io_examples(lganm_envs: List[np.ndarray],
     return dt_trn, dt_val, dt_tst
 
 
+def get_por123_io_examples(portec_file: pathlib.Path,
+                           causal: List[str],
+                           outcome: str) -> Tuple[Tuple, Tuple, Tuple]:
+    """Obtain the portec data 
+
+    Args:
+        portec_file: the *.sav file storing portec data
+        causal: the candidate causal variables
+        outcome: the outcome data, RFSstatus and RFSyears
+
+    Returns:
+        the train, val, test portec data 
+    """
+
+    df, _ = pyreadstat.read_sav(str(portec_file))
+    df = df.dropna(subset=causal)
+    df = df.dropna(subset=outcome)
+
+    # the values of the cau_var are the median of that variable,
+    # which is used to create binary lable
+    portec = list()
+    df_input, df_lab = list(), list()
+    max_len = 0
+    for i in range(3):
+        df_ptc = df.loc[df['PortecStudy'] == i + 1]
+        df_ptc = np.concatenate((df_ptc[causal].values,
+                                 df_ptc[outcome].values), axis=-1)
+        portec.append(df_ptc)
+        max_len = max(max_len, df_ptc.shape[0])
+
+    for ptc_id, ptc in enumerate(portec):
+        ptc = pad_array(ptc, max_len)
+        df_input.append(ptc[:, :-len(outcome)])
+        df_lab.append(ptc[:, -len(outcome):])
+
+    df_trn = (np.stack(df_input, 1),
+              np.stack(df_lab, 1))
+    df_val, df_tst = df_trn, df_trn
+    print(df_trn[0].shape, df_trn[1].shape)
+    return df_trn, df_val, df_tst
+
+
+def prep_sav_portec123_age(portec_dir):
+    # obtain the dict that maps case_id to spot_id
+    sav_file = portec_dir / 'P123_update.sav'
+
+    df, meta = pyreadstat.read_sav(str(sav_file))
+    df['Age'] = 0.0
+    df.loc[(df['age'] >= 60) & (df['age'] <= 70), 'Age'] = 1.0
+    df.loc[df['age'] > 70, 'Age'] = 2.0
+
+    df['LVSI2'] = df['LVSI_2cat']
+    # df['Grade3'] = (df['Histgrade_3cat'] - 1) / 2.
+    df['Stage2'] = df['stage_2cat'] - 1
+    # df['Stage4'] = (df['stage_4cat'] - 1) / 3.
+    df['Treat2'] = df['treat_2cat']
+    # df['Treat4'] = df['treat'] / 3.
+
+    for gid, gol in enumerate(['g2', 'g3']):
+        df[gol] = np.zeros_like(df['Histgrade_3cat'].values)
+        # Histgrade_3cat value 1 (ref), 2, 3
+        df.loc[df['Histgrade_3cat'] == gid + 2, gol] = 1
+
+    for sid, sol in enumerate(['s2', 's3', 's4']):
+        df[sol] = np.zeros_like(df['stage_4cat'].values)
+        # stage_4cat value 1 (ref), 2, 3
+        df.loc[df['stage_4cat'] == sid + 2, sol] = 1
+
+    for mid, mol in enumerate(['POLE', 'MMRd', 'p53a']):
+        df[mol] = df['TCGA_4groups']
+        # assign 0 to not nan cases of TCGA groups
+        df.loc[~df['TCGA_4groups'].isnull(), mol] = 0
+        df.loc[df['TCGA_4groups'] == mid + 1, mol] = 1
+
+    for tid, tol in enumerate(['t1', 't2', 't3']):
+        df[tol] = np.zeros_like(df['treat'].values)
+        df.loc[df['treat'] == tid + 1, tol] = 1
+
+    new_sav = portec_dir / f'portec_update_age.sav'
+    print(new_sav)
+    pyreadstat.write_sav(df, str(new_sav))
+    new_csv = sav_file.parents[0] / f'portec_update_age.csv'
+    print(new_csv)
+    df.to_csv(str(new_csv))
+
+
 def main():
-    pass
+    sav_file = pathlib.Path('/Path/to/PORTEC123')
+    prep_sav_portec123_age(sav_file)
 
 
 if __name__ == '__main__':

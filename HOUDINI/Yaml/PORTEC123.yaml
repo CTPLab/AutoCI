@@ -1,0 +1,70 @@
+binary:
+    clinical_meta:
+        causal:
+            Age: [0, 1.0, 2.0]
+            s2: [0, 1, 1]
+            s3: [0, 1, 1]
+            s4: [0, 1, 1]
+            g2: [0, 1, 1]
+            g3: [0, 1, 1]
+            LVSI2: [0, 1, 1]
+            POLE: [0, 1, 1]
+            MMRd: [0, 1, 1]
+            p53a: [0, 1, 1]
+            t1: [0, 1, 1]
+            t2: [0, 1, 1]
+            t3: [0, 1, 1]
+            InclusionDay: [0, 0, 0]
+            InclusionMonth: [0, 0, 0]
+        causal_num: 15
+        causal_grp: [[0], [1, 2, 3], [4, 5], [6], [7, 8, 9], [10, 11, 12], [13], [14]]
+    metric_scores:
+        - Concord_Index
+        - Brier_Score
+        - Binomial_Log-Likelihood
+    truth: [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10], [11], [12]]
+
+
+baseline:
+    clinical_meta:
+        causal:
+            Age: [0, 1.0, 2.0]
+            Stage2: [0, 1, 1]
+            LVSI2: [0, 1, 1]
+            POLE: [0, 1, 1]
+            MMRd: [0, 1, 1]
+            p53a: [0, 1, 1]
+            Treat2: [0, 1, 1]
+            InclusionDay: [0, 0, 0]
+            InclusionMonth: [0, 0, 0]
+        causal_num: 9
+        causal_grp: [[0], [1], [2], [3, 4, 5], [6], [7], [8]]
+    metric_scores:
+        - Concord_Index
+        - Brier_Score
+        - Binomial_Log-Likelihood
+    truth: [[0], [1], [2], [3], [4], [5], [6]]
+
+
+over_surv:
+    - survstat
+    - fupyrs
+endo_surv:
+    - ECdeath
+    - fupyrs    
+orec_recur:
+    - orecstat
+    - orecyrs
+adrec_recur:
+    - adrecstat
+    - adrecyrs
+lrec_recur:
+    - lrecstat
+    - lrecyrs
+    
+vrec_recur:
+    - vrecstat
+    - vrecyrs
+prec_recur:
+    - precstat
+    - precyrs

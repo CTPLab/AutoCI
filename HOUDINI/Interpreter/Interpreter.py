@@ -330,7 +330,11 @@ class Interpreter:
 
             g_in = torch.tensor(
                 list(self.data_dict['clinical_meta']['causal'].values()))
-            g_in = g_in.unsqueeze(dim=0).unsqueeze(dim=0).float()
+            if len(g_in.shape) == 1:
+                g_in = g_in.unsqueeze(dim=0).unsqueeze(dim=0).float()
+            else:
+                g_in = g_in.T.unsqueeze(1)
+
             if torch.cuda.is_available():
                 g_in = g_in.cuda()
             cox_grads = self._compute_grad(g_in,
@@ -592,7 +596,6 @@ class Interpreter:
         val_grads, val_scores, val_dos = list(), list(), list()
         warm_grads, warm_scores, warm_dos = list(), list(), list()
         jacads, fwers = list(), list()
-        jacads, fwers
         for _ in range(self.data_dict['repeat']):
             if unknown_fns_def is not None and \
                unknown_fns_def.__len__() > 0:
@@ -646,16 +649,17 @@ class Interpreter:
                     'fwers': fwers,
                     'rej_vars': reject_vars,
                     'acc_vars': accept_vars}
-
         if self.output_type == ProgramOutputType.HAZARD:
             # output the tables recording the metrics of
             # survival analysis, p-value, CI, z-score, etc.
-            cox_index = list(self.data_dict['clinical_meta']['causal'].keys())
+            cox_idx = list(self.data_dict['clinical_meta']['causal'].keys())
+            cox_wei = list(self.data_dict['clinical_meta']['causal'].values())
             cox_dir = self.data_dict['results_dir']
 
             warm_grads = np.asarray(warm_grads)
             warm_scores = list(zip(*warm_scores))
-            warm_utils = MetricUtils.coxsum(cox_index,
+            warm_utils = MetricUtils.coxsum(cox_idx,
+                                            cox_wei,
                                             warm_grads,
                                             file_nm='portec_warm_up_{}'.format(program))
             warm_utils.vis_plot(warm_scores,
@@ -665,7 +669,8 @@ class Interpreter:
 
             val_grads = np.asarray(val_grads)
             val_scores = list(zip(*val_scores))
-            val_utils = MetricUtils.coxsum(cox_index,
+            val_utils = MetricUtils.coxsum(cox_idx,
+                                           cox_wei,
                                            val_grads,
                                            file_nm='portec_{}'.format(program))
             val_utils.vis_plot(val_scores,

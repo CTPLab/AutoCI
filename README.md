@@ -1,21 +1,44 @@
 # AutoCI
-Official PyTorch implementation for the following manuscript:
+Official PyTorch implementation for the following manuscripts:
 
-[Automated causal inference in application to randomized controlled clinical trials](https://www.nature.com/articles/s42256-022-00470-y), Nature Machine Intelligence (2022). \
-Jiqing Wu, Nanda Horeweg, Marco de Bruyn, Remi A. Nout, Ina M. Jürgenliemk-Schulz, Ludy C.H.W. Lutgens, Jan J. Jobsen, Elzbieta M. van der Steen-Banasik, Hans W. Nijman, Vincent T.H.B.M. Smit, Tjalling Bosse, Carien L. Creutzberg, and Viktor H. Koelzer.
+[Automated causal inference in application to randomized controlled clinical trials](https://www.nature.com/articles/s42256-022-00470-y), Nature Machine Intelligence (2022). 
 
+[Prognostic impact and causality of age on oncological outcomes in women with endometrial cancer: a multimethod analysis of the randomised PORTEC-1, -2 and -3 trials](https://www.sciencedirect.com/science/article/pii/S1470204524001426), Lancet Oncology (2024). 
 
-> Randomized controlled trials (RCTs) are considered as the gold standard for testing causal hypotheses in the clinical domain. However, the investigation of prognostic variables of patient outcome in a hypothesized cause-effect route is not feasible using standard statistical methods. Here, we propose a new automated causal inference method (AutoCI) built upon the invariant causal prediction (ICP) framework for the causal re-interpretation of clinical trial data. Compared to existing methods, we show that the proposed AutoCI allows to efficiently determine the causal variables with a clear differentiation on two real-world RCTs of endometrial cancer patients with mature outcome and extensive clinicopathological and molecular data. This is achieved via suppressing the causal probability of non-causal variables by a wide margin. In ablation studies, we further demonstrate that the assignment of causal probabilities by AutoCI remain consistent in the presence of confounders. In conclusion, these results confirm the robustness and feasibility of AutoCI for future applications in real-world clinical analysis.
 
 <p align="center">
 <img src="visual/fig1.png" width="1600px"/>  
 <br>
-The overall model illustration and performance of the proposed AutoCI.       
+The overall model illustration of the proposed AutoCI.       
 </p>
 
-<a href="https://arxiv.org/pdf/2201.05773.pdf"><img src="https://img.shields.io/badge/Nature-MachineIntelligence-brightgreen" height=22.5></a> \
+<a href="https://www.nature.com/articles/s42256-022-00470-y"><img src="https://img.shields.io/badge/Nature-MachineIntelligence-brightgreen" height=22.5></a> \
+<a href="https://www.nature.com/articles/s42256-022-00470-y"><img src="https://img.shields.io/badge/Lancet-Oncology-orange" height=22.5></a> \
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" height=22.5></a>  
 
+If you find this repository helpful for your research, we would appreciate your citation of our studies.
+```
+@article{wu2022automated,
+    title={Automated causal inference in application to randomized controlled clinical trials},
+    author={Wu, Ji Q and Horeweg, Nanda and de Bruyn, Marco and Nout, Remi A and J{\"u}rgenliemk-Schulz, Ina M and Lutgens, Ludy CHW and Jobsen, Jan J and Van der Steen-Banasik, Elzbieta M and Nijman, Hans W and Smit, Vincent THBM and others},
+    journal={Nature Machine Intelligence},
+    volume={4},
+    number={5},
+    pages={436--444},
+    year={2022},
+    publisher={Nature Publishing Group UK London}
+}
+
+@article{WAKKERMAN2024,
+    title = {Prognostic impact and causality of age on oncological outcomes in women with endometrial cancer: a multimethod analysis of the randomised PORTEC-1, PORTEC-2, and PORTEC-3 trials},
+    author = {Famke C Wakkerman and Jiqing Wu and Hein Putter and Ina M Jürgenliemk-Schulz and Jan J Jobsen and Ludy C H W Lutgens and Marie A D Haverkort and Marianne A {de Jong} and Jan Willem M Mens and Bastiaan G Wortman and Remi A Nout and Alicia Léon-Castillo and Melanie E Powell and Linda R Mileshkin and Dionyssios Katsaros and Joanne Alfieri and Alexandra Leary and Naveena Singh and Stephanie M {de Boer} and Hans W Nijman and Vincent T H B M Smit and Tjalling Bosse and Viktor H Koelzer and Carien L Creutzberg and Nanda Horeweg},
+    journal = {The Lancet Oncology},
+    year = {2024},
+    issn = {1470-2045},
+    doi = {https://doi.org/10.1016/S1470-2045(24)00142-6},
+    url = {https://www.sciencedirect.com/science/article/pii/S1470204524001426},
+}
+```
 
 
 ## Installation
@@ -25,14 +48,16 @@ This implementation is dependent on heavily refactored [HOUDINI](https://github.
 This implementation has been successfully tested under the following configurations,
 while these configurations could be downgraded to a wide range of earlier versions:
 
-- Ubuntu 20.04
-- Nvidia driver 470.86
-- CUDA 11.4
+- Ubuntu 22.04
+- Nvidia driver 525.147
+- CUDA 11.7
 - Python 3.9
+- PyTorch 2.1
 - Miniconda 
 - Docker 
 - Nvidia-Docker2
 
+Note that lower PyTorch version should also work.
 After the prerequisites are satisfied, you could either build the docker image
 or install conda dependencies.
 
@@ -49,8 +74,6 @@ Assume a local Conda environment is installed and activated,
 install the dependencies as follows   
 
 ```
-conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
-
 pip install scipy pandas pycox pylatex pygam pyaml pyreadstat matplotlib scikit-learn termcolor sklearn joblib lifelines  networkx==2.4 sempler==0.1.1
 ```
 You could also try creating a conda environment from [environment.yml](environment.yml).
@@ -68,7 +91,7 @@ Download the following toy datasets and unzip them resp.:
     - [1 confounder](https://zenodo.org/records/10042871/files/abcd1.zip?download=1) 
     - [2 confounders](https://zenodo.org/records/10042871/files/abcd2.zip?download=1)
 
-## Run the Experiments
+## Run the Toy Experiments
 In case of using Docker image, you could first launch the Docker image
 
 **Launch the Docker Image**
@@ -97,7 +120,21 @@ python -m HOUDINI.Run.baseline_lganm --lganm-dir /Path/to/Data \
                                      --method nicp (or icp)
 ```
 **Run the AICP experiments**    
-See [AICP](https://github.com/juangamella/aicp) repository for more details.
+Please see [AICP](https://github.com/juangamella/aicp) repository for more details.
+
+## Run the PORTEC123 Experiments
+
+**Run the AutoCI analysis**
+```
+cd /Path/To/AutoCI/
+sh run.sh
+```
+
+**Run the correlation analysis**
+
+Please check the R script [correlation_analysis.R](correlation_analysis.R) for the implementation detail. 
+
+
 
 ## Tipps for training models without program synthesis  
 If you want to train the neural network model while excluding the program sythesis module, then you could refactor the following codes to obtain simple neural network training codes:     
